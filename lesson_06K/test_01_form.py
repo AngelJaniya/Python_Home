@@ -60,5 +60,3 @@ def test_form():
     check_result('zip-code', 'alert-danger')
 
     driver.quit()
-
-#111

@@ -49,5 +49,3 @@ def test_form():
     driver.quit()
 
     assert result.split(" ")[1] == "$58.29"
-
-#111
