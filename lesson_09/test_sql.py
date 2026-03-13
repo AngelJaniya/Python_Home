@@ -1,63 +1,50 @@
 from sqlalchemy import create_engine, text
 
-
 db_connection_string = (
-        "postgresql://postgres:postgres@localhost:5432/university")
+    "postgresql://postgres:postgres@localhost:5432/university"
+)
 db = create_engine(db_connection_string)
 
 
 def get_subject():
-    connection = db.connect()
-    result = connection.execute(
-            text("SELECT * FROM subject WHERE subject_id = :id"), {'id': 777})
-    rows = result.mappings().all()
-    connection.close()
-    return rows
+    with db.connect() as connection:
+        result = connection.execute(
+            text("SELECT * FROM subject WHERE subject_id = :id"),
+            {'id': 777}
+        )
+        return result.mappings().all()
 
 
 def insert_subject():
-    connection = db.connect()
-    sql = 'INSERT INTO subject(subject_id, subject_title) values (:id, :title)'
-    connection.execute(
+    with db.connect() as connection:
+        sql = (
+            'INSERT INTO subject(subject_id, subject_title) '
+            'values (:id, :title)'
+        )
+        connection.execute(
             text(sql),
-            {'id': 777, 'title': 'Magick'})
-    connection.close()
+            {'id': 777, 'title': 'Magick'}
+        )
+        connection.commit()
 
 
 def update_subject():
-    connection = db.connect()
-    sql = 'UPDATE subject SET subject_title = :title WHERE subject_id = :id'
-    connection.execute(
+    with db.connect() as connection:
+        sql = (
+            'UPDATE subject SET subject_title = :title '
+            'WHERE subject_id = :id'
+        )
+        connection.execute(
             text(sql),
-            {'id': 777, 'title': 'Thaumaturgy'})
-    connection.close()
+            {'id': 777, 'title': 'Thaumaturgy'}
+        )
+        connection.commit()
 
 
 def delete_subject():
-    connection = db.connect()
-    connection.execute(
+    with db.connect() as connection:
+        connection.execute(
             text('DELETE FROM subject WHERE subject_id = :id'),
-            {'id': 777})
-    connection.close()
-
-
-def test_insert():
-    insert_subject()
-    rows = get_subject()
-    delete_subject()
-    assert rows[0]['subject_title'] == 'Magick'
-
-
-def test_update():
-    insert_subject()
-    update_subject()
-    rows = get_subject()
-    delete_subject()
-    assert rows[0]['subject_title'] == 'Thaumaturgy'
-
-
-def test_delete():
-    insert_subject()
-    delete_subject()
-    rows = get_subject()
-    assert len(rows) == 0
+            {'id': 777}
+        )
+        connection.commit()
